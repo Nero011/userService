@@ -1,4 +1,4 @@
-namespace go userService
+namespace go user
 
 struct RegisterRequest{
     1: string userName
