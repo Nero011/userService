@@ -54,3 +54,42 @@ func (s *UserServiceImpl) Register(ctx context.Context, req *user.RegisterReques
 	}
 	return resp, nil
 }
+
+// Login implements the UserServiceImpl interface.
+func (s *UserServiceImpl) Login(ctx context.Context, req *user.LoginRequest) (resp *user.LoginResponse, err error) {
+	// TODO：并发环境测试
+	db := util.MysqlInit()
+	sqlStr := fmt.Sprintf(`select user_name, user_pwd from user where user_name = "%s"`, req.GetUserName())
+	row, err := db.Query(sqlStr)
+	if err != nil {
+		return nil, err
+	}
+	exist := false
+	for row.Next() {
+		exist = true
+		var name, pwd string
+		err = row.Scan(&name, &pwd)
+		if err != nil {
+			return nil, err
+		}
+		if pwd == req.GetUserPwd() {
+			resp = &user.LoginResponse{
+				Success: true,
+				ErrMsg:  "",
+			}
+			return resp, nil
+		} else {
+			resp = &user.LoginResponse{
+				Success: false,
+				ErrMsg:  "password error",
+			}
+		}
+	}
+	if exist == false {
+		resp = &user.LoginResponse{
+			Success: false,
+			ErrMsg:  "user is not exist",
+		}
+	}
+	return
+}
