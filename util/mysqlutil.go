@@ -17,7 +17,7 @@ func MysqlInit() *sql.DB {
 		return Db
 	}
 	var err error
-	Db, err = sql.Open("mysql", "root:123456@/netstore_user")
+	Db, err = sql.Open("mysql", "root:123456@/netstorage")
 	if err != nil {
 		return nil
 	}
