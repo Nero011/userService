@@ -12,7 +12,7 @@ type UserServiceImpl struct{}
 
 // Register implements the UserServiceImpl interface.
 func (s *UserServiceImpl) Register(ctx context.Context, req *user.RegisterRequest) (resp *user.RegisterResponse, err error) {
-	// TODO: Your code here...
+	// TODO: 并发环境测试
 	db := util.MysqlInit()
 	//sqlStr := "select user_name from user where	user_name = \"" + req.GetUserName() + "\""
 	sqlStr := fmt.Sprintf(`select user_name from user where user_name = "%s"`, req.GetUserName())
