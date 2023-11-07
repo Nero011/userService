@@ -607,6 +607,20 @@ func (p *LoginResponse) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
+		case 3:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField3(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -670,6 +684,20 @@ func (p *LoginResponse) FastReadField2(buf []byte) (int, error) {
 	return offset, nil
 }
 
+func (p *LoginResponse) FastReadField3(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.Auth = v
+
+	}
+	return offset, nil
+}
+
 // for compatibility
 func (p *LoginResponse) FastWrite(buf []byte) int {
 	return 0
@@ -681,6 +709,7 @@ func (p *LoginResponse) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryW
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 		offset += p.fastWriteField2(buf[offset:], binaryWriter)
+		offset += p.fastWriteField3(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
 	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
@@ -693,6 +722,7 @@ func (p *LoginResponse) BLength() int {
 	if p != nil {
 		l += p.field1Length()
 		l += p.field2Length()
+		l += p.field3Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
@@ -717,6 +747,15 @@ func (p *LoginResponse) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryW
 	return offset
 }
 
+func (p *LoginResponse) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "auth", thrift.STRING, 3)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Auth)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
 func (p *LoginResponse) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("success", thrift.BOOL, 1)
@@ -730,6 +769,15 @@ func (p *LoginResponse) field2Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("errMsg", thrift.STRING, 2)
 	l += bthrift.Binary.StringLengthNocopy(p.ErrMsg)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *LoginResponse) field3Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("auth", thrift.STRING, 3)
+	l += bthrift.Binary.StringLengthNocopy(p.Auth)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
