@@ -17,6 +17,7 @@ struct LoginRequest{
 struct LoginResponse{
     1: bool success
     2: string errMsg
+    3: string auth
 }
 
 service UserService{
